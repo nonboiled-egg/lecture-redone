@@ -8,7 +8,7 @@
 
 import Foundation
 //main Model
-class Concentration{    //class:reference type
+struct Concentration{    //class:reference type
     private(set) var cards = [Card]()
     private(set) var flipCount = 0
     private(set) var score = 0
@@ -34,7 +34,7 @@ class Concentration{    //class:reference type
         }
     }
     
-    func chooseCard(at index: Int){
+    mutating func chooseCard(at index: Int){
         assert(cards.indices.contains(index),"chooseCard(at: \(index)): chosen card is not in cards array")//error catch
         if !cards[index].isMatched{     //ignore all matched cards
             if !cards[index].isFacedUp{
@@ -59,20 +59,24 @@ class Concentration{    //class:reference type
                 indexOfOneAndOnlyFacedUpCard = index
             }
         }
-        //print ("\(score)")
+        print ("\(cards[index].identifier)")
+    }
+    
+    mutating func randomDistribution(){
+        var temp = [Card]()
+        for _ in 0..<cards.count{
+            temp.append(cards.remove(at: cards.count.arc4random))
+        }
+        cards = temp
     }
     
     init(numberOfPairsOfCards: Int) {
         assert(numberOfPairsOfCards > 0,"there must be at least 1 pair of cards.")
-        var temp = [Card]()
-        for _ in 0...numberOfPairsOfCards{     //countable range 0...10 -> 0to10 inclusive
+        for _ in 1...numberOfPairsOfCards{     //countable range 0...10 -> 0to10 inclusive
             let card = Card()
-            temp += [card,card]
+            cards += [card,card]
         }
-        for _ in temp.indices{
-            cards.append(temp.remove(at: Int(arc4random_uniform(UInt32(temp.count)))))
-        }
-        
+        randomDistribution()
     }
 }
 
@@ -136,12 +140,14 @@ class Concentration{    //class:reference type
     //STRUCT
         //value type
         //no inheritance
-        //
+        //may require "mutating"
     //ENUM
-        //
+        //refer the note above
     //PROTOCOL
-        //
-
+        //WHY:makes API flexible
+        //   :sharing functonality
+        //HOW:
+        //no data storage
 //Automatic Referencing Counting
     //strong:   default
     //weak:     if there's no strong pointer, set to nil

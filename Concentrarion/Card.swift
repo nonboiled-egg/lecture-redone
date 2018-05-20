@@ -13,7 +13,7 @@ struct Card{        //struct:value type(it gets copied when called), no inherita
     var identifier: Int
     var isSeen = false
     
-    private static var identifierFactory = -1
+    private static var identifierFactory = 0
     
     init(identifier: Int) {                         //initialized(swift) == constructor(Java,C++)
         self.identifier = identifier
