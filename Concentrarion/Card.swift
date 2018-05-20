@@ -11,7 +11,9 @@ struct Card{        //struct:value type(it gets copied when called), no inherita
     var isFacedUp = false
     var isMatched = false
     var identifier: Int
-    static var identifierFactory = -1
+    var isSeen = false
+    
+    private static var identifierFactory = -1
     
     init(identifier: Int) {                         //initialized(swift) == constructor(Java,C++)
         self.identifier = identifier
@@ -21,7 +23,7 @@ struct Card{        //struct:value type(it gets copied when called), no inherita
         self.identifier = Card.getUniqueIdentifier()
     }
     
-    static func getUniqueIdentifier() -> Int{
+    private static func getUniqueIdentifier() -> Int{
         identifierFactory += 1
         return identifierFactory
     }

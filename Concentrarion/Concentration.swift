@@ -9,31 +9,61 @@
 import Foundation
 //main Model
 class Concentration{    //class:reference type
-    var cards = [Card]()
-    var indexOfOneAndOnlyFacedUpCard: Int?
+    private(set) var cards = [Card]()
+    private(set) var flipCount = 0
+    private(set) var score = 0
     
-    func chooseCard(at index: Int){
-        if !cards[index].isMatched{     //ignore all matched cards
-            if let matchIndex = indexOfOneAndOnlyFacedUpCard, matchIndex != index{
-                //chech if match
-                if cards[matchIndex].identifier == cards[index].identifier{
-                    cards[matchIndex].isMatched = true
-                    cards[index].isMatched = true
+    private var indexOfOneAndOnlyFacedUpCard: Int?{
+        get{
+            var foundIndex:Int?
+            for index in cards.indices{
+                if cards[index].isFacedUp{
+                    if foundIndex == nil{
+                        foundIndex = index
+                    }else{
+                        return nil
+                    }
                 }
-                cards[index].isFacedUp = true
-                indexOfOneAndOnlyFacedUpCard = nil
-            }else{
-                // 0 or 2
-                for flipDownIndex in cards.indices{
-                    cards[flipDownIndex].isFacedUp = false
-                }
-                cards[index].isFacedUp = true
-                indexOfOneAndOnlyFacedUpCard = index
+            }
+            return foundIndex
+        }
+        set{
+            for index in cards.indices{
+                cards[index].isFacedUp = (index == newValue) //if it's the only faced up card, keep it up and keep others down
             }
         }
     }
     
+    func chooseCard(at index: Int){
+        assert(cards.indices.contains(index),"chooseCard(at: \(index)): chosen card is not in cards array")//error catch
+        if !cards[index].isMatched{     //ignore all matched cards
+            if !cards[index].isFacedUp{
+                flipCount += 1
+            }
+            
+            if let matchIndex = indexOfOneAndOnlyFacedUpCard, matchIndex != index{
+                //check if match
+                if cards[matchIndex].identifier == cards[index].identifier{
+                    cards[matchIndex].isMatched = true
+                    cards[index].isMatched = true
+                    score += 2
+                }else if cards[matchIndex].isSeen || cards[index].isSeen{
+                    score -= 1
+                }
+                cards[index].isFacedUp = true
+                cards[index].isSeen = true
+                cards[matchIndex].isSeen = true
+                
+            }else{
+                // 0 or 2
+                indexOfOneAndOnlyFacedUpCard = index
+            }
+        }
+        //print ("\(score)")
+    }
+    
     init(numberOfPairsOfCards: Int) {
+        assert(numberOfPairsOfCards > 0,"there must be at least 1 pair of cards.")
         var temp = [Card]()
         for _ in 0...numberOfPairsOfCards{     //countable range 0...10 -> 0to10 inclusive
             let card = Card()
@@ -45,3 +75,74 @@ class Concentration{    //class:reference type
         
     }
 }
+
+//tuple declaration
+//1
+    //let x: (TYPE1,TYPE2,TYPE3) = (VALUE1,VALUE2,VALUE3)
+    //let (NAME1,NAME2,NAME3) = x
+    //NAME1 = VALUE1...
+//2
+    //let x: (NAME1:TYPE1, NAME2:TYPE2, NAME3:TYPE3) = (VALUE1, VALUE2, VALUE3)
+    //x.NAME1 = VALUE1...
+//3
+    //let (NAME1,NAME2,NAME3) = x
+
+//COMPUTED PROPERTY
+//var foo{
+//  get{return the calculated value of foo}
+//  set(NEWVALUE){}//OPTIONAL
+//}
+
+//assert
+//assert(<#T##condition: Bool##Bool#>,message: String)
+
+//extention
+//no storage
+
+//enum declaration VALUE TYPE
+
+    //    enum FastFoodMenuItem{
+    //        case hamburger(numberOfPatties:Int)
+    //        case frise(size: FryOrderSize)
+    //        case drink(String, ounce:Int)
+    //        case cookie
+    //
+    //        mutating func NAME(){
+    //            self = .cookie
+    //        }
+    //    }
+    //    enum FryOrderSize{
+    //        case large
+    //        case small
+    //    }
+    //
+    //    lat menuItem: FastFoodMenuItem = FastFoodMenuItem.humburger(patties: 2)
+    //    switch menuItem{
+    //      case .humburger: CODE
+    //      case .fries, .drink: CODE
+    //      default: CODE
+    //    }
+
+//ABOUT OPTIONAL
+//enum Optional<TYPE>{
+//    case none
+//    case some(<TYPE>)
+//}
+
+//DATA STRUCTURE
+    //CLASS
+        //reference type
+        //inheritance
+    //STRUCT
+        //value type
+        //no inheritance
+        //
+    //ENUM
+        //
+    //PROTOCOL
+        //
+
+//Automatic Referencing Counting
+    //strong:   default
+    //weak:     if there's no strong pointer, set to nil
+    //unknown:  rare(to avoid memory cycle)

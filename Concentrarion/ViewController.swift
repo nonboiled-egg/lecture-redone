@@ -14,31 +14,40 @@ class ViewController: UIViewController {
     //var NAME(: TYPE) = VALUE
     //func NAME (EXTERNAL INTERNAL:TYPE) -> RETURN-TYPE{CODE}
     
-    lazy var game = Concentration(numberOfPairsOfCards: cardButtons.count/2)                          //free init() is created if all var are initialized
+    var numberOfPairsOfCards:Int{
+       return (cardButtons.count+1)/2
+    }
+    
+    private lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)                          //free init() is created if all var are initialized
     //lazy variables await to intantiate
     
-    var flipCount = 0 {                                 //variables must be initiated
-        didSet{                                         //property obsever (executes when canged)
-            flipCountLabel.text = "\(flipCount) FLIP"   //\() converts to string
-        }
-    }
+    //var flipCount = 0 {                                 //variables must be initiated
+    //    didSet{                                         //property obsever (executes when canged)
+    //        flipCountLabel.text = "\(flipCount) FLIP"   //\() converts to string
+    //    }
+    //}
 
     @IBOutlet weak var flipCountLabel: UILabel!
     
     @IBOutlet var cardButtons: [UIButton]!
     
-    var emojiChoices = ["👺","💩","🎃","💍","👽","👾","🤖","🎃","🖕","👹"]
+    private var emojiChoices = ["👺","💩","🎃","💍","👽","👾","🤖","🖕","👹","👻"]
     
     @IBAction func touchCard(_ sender: UIButton) {                      //called when button is touched
-        flipCount += 1
+        
         if let cardNumber = cardButtons.index(of: sender){              //unwrapping optional
             game.chooseCard(at: cardNumber)                             //communication to model
+            
             updateViewFromModel()
         }
     }
     
-    func updateViewFromModel(){
+    private func updateViewFromModel(){
+        flipCountLabel.text = "\(game.flipCount) FLIP \(game.score) POINTS"
         for index in cardButtons.indices{                               // for button in cardButtons dont work cuz button is a let and cant be mutated in the loop
+            
+            //QUESTION: HOW DO I CHANGE FONT SIZE OF THE BUTTON LABEL ACCODING TO THE BUTTON SIZE?
+            
             let button = cardButtons[index]
             let card = game.cards[index]
             if card.isFacedUp{
@@ -51,15 +60,27 @@ class ViewController: UIViewController {
         }
     }
    
-    var emoji = [Int:String]()
+    private var emoji = [Int:String]()
     
-    func emoji(for card: Card) -> String{
+    private func emoji(for card: Card) -> String{
         if emoji[card.identifier] == nil, emojiChoices.count > 0{
-            let randomIndex = Int(arc4random_uniform(UInt32(emojiChoices.count)))        //no auto type conversion, I have to do it
-            emoji[card.identifier] = emojiChoices.remove(at: randomIndex)
+            emoji[card.identifier] = emojiChoices.remove(at: emojiChoices.count.arc4random)
         }
-        
         return  emoji[card.identifier] ?? "?"
     }
 }
+
+extension Int{
+    var arc4random:Int{
+        if self == 0{
+            return 0
+        }else if self < 0{
+            return -Int(arc4random_uniform(UInt32(self)))   //no auto type conversion, I have to do it
+        }else{
+            return Int(arc4random_uniform(UInt32(self)))
+        }
+    }
+}
+
+//private(set) READ ONLY
 
