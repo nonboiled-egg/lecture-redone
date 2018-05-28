@@ -27,7 +27,11 @@ class ViewController: UIViewController {
     //    }
     //}
 
-    @IBOutlet weak var flipCountLabel: UILabel!
+    @IBOutlet weak var flipCountLabel: UILabel!{
+        didSet{
+            updateFlipCountLabel()
+        }
+    }
     
     @IBOutlet var cardButtons: [UIButton]!
     
@@ -42,8 +46,20 @@ class ViewController: UIViewController {
         }
     }
     
+    private func updateFlipCountLabel(){
+        let attributes: [NSAttributedStringKey: Any] = [
+            .strokeWidth : 5.0,
+            .strokeColor :#colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+        ]
+        let attributedString = NSAttributedString(string: "\(game.flipCount) FLIP \(game.score) POINTS", attributes: attributes)
+        
+        flipCountLabel.attributedText = attributedString
+    }
+    
     private func updateViewFromModel(){
-        flipCountLabel.text = "\(game.flipCount) FLIP \(game.score) POINTS"
+        updateFlipCountLabel()
+        
+        //flipCountLabel.text = "\(game.flipCount) FLIP \(game.score) POINTS"
         for index in cardButtons.indices{                               // for button in cardButtons dont work cuz button is a let and cant be mutated in the loop
             
             //QUESTION: HOW DO I CHANGE FONT SIZE OF THE BUTTON LABEL ACCODING TO THE BUTTON SIZE?
@@ -60,13 +76,13 @@ class ViewController: UIViewController {
         }
     }
    
-    private var emoji = [Int:String]()
+    private var emoji = [Card:String]()
     
     private func emoji(for card: Card) -> String{
-        if emoji[card.identifier] == nil, emojiChoices.count > 0{
-            emoji[card.identifier] = emojiChoices.remove(at: (emojiChoices.count-1).arc4random)
+        if emoji[card] == nil, emojiChoices.count > 0{
+            emoji[card] = emojiChoices.remove(at: (emojiChoices.count-1).arc4random)
         }
-        return  emoji[card.identifier] ?? "?"
+        return  emoji[card] ?? "?"
     }
 }
 

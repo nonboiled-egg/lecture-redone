@@ -7,10 +7,17 @@
 //
 
 import Foundation
-struct Card{        //struct:value type(it gets copied when called), no inheritance
+struct Card : Hashable
+{        //struct:value type(it gets copied when called), no inheritance
+    var hashValue : Int{return identifier}
+    
+    static func == (lhs: Card, rhs: Card) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+    
     var isFacedUp = false
     var isMatched = false
-    var identifier: Int
+    private var identifier: Int
     var isSeen = false
     
     private static var identifierFactory = 0
